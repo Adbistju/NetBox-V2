@@ -13,8 +13,13 @@ public class ServerControl {
 
     public void command(String commandClient){
         String input = commandClient;
-
         String tokens[] = input.split("\\s");
+
+       // tokens = buildierM(tokens);
+       /* if(){
+
+        }*/
+
         String command = tokens[0+corrector];
 
         switch (command) {
@@ -47,5 +52,13 @@ public class ServerControl {
                 fileManager.changeDirectory(folderName);
                 break;
         }
+    }
+
+    public String[] buildierM(String[] credentialValues){
+        String[] add = new String[credentialValues.length-1];
+        for (int j = 0; j < credentialValues.length-1; j++) {
+            add[j]=credentialValues[j+1];
+        }
+        return add;
     }
 }
