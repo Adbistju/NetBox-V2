@@ -42,9 +42,7 @@ public class FileManager {
                 }
                 System.out.println();
             }
-
         }
-
     }
 
     public void copyFile(String sourceFileName, String destFileName) {
@@ -60,7 +58,7 @@ public class FileManager {
     public void copyFile(String sourceFileName) {
         File source = new File(currentFolder + "\\" + sourceFileName);
         String [] arr = sourceFileName.split("\\.");
-        File dest = new File(currentFolder + "\\"+arr[arr.length-2] + " - copy"+"."+arr[arr.length-1]);
+        File dest = new File(currentFolder + "\\"+arr[arr.length-2] /*sourceFileName*/ + " - copy"+"."+arr[arr.length-1]);
         try {
             FileUtils.copyFile(source, dest);
         } catch (IOException e) {

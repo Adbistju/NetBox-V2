@@ -15,11 +15,6 @@ public class ServerControl {
         String input = commandClient;
         String tokens[] = input.split("\\s");
 
-       // tokens = buildierM(tokens);
-       /* if(){
-
-        }*/
-
         String command = tokens[0+corrector];
 
         switch (command) {
@@ -30,35 +25,88 @@ public class ServerControl {
                 fileManager.listOfFiles(true);
                 break;
             case Commands.COPY_FILE:
-                String sourceFileName = tokens[1+corrector];
-                if(2+corrector == tokens.length-1){
-                    String destFileName = tokens[2+corrector];
-                    fileManager.copyFile(sourceFileName, destFileName);
-                } else {
+                String sourceFileName = buildierM(tokens);
+                String destFileName = buildierTwoNameFile(tokens);
+                if(destFileName.equals("")){
                     fileManager.copyFile(sourceFileName);
+                } else {
+                    fileManager.copyFile(sourceFileName, destFileName);
                 }
                 break;
             case Commands.CREATE_FILE: {
-                String fileName = tokens[1+corrector];
-                fileManager.createFile(fileName);
+                String folderName = buildierM(tokens);
+                fileManager.createFile(folderName);
                 break;
             }
-            case Commands.FILE_CONTENT:
-                String fileName = tokens[1+corrector];
-                fileManager.fileContent(fileName);
+            case Commands.FILE_CONTENT:{
+                String folderName = buildierM(tokens);
+                fileManager.fileContent(folderName);
                 break;
+            }
             case Commands.CHANGE_DIRECTORY:
-                String folderName = tokens[1+corrector];
+                String folderName = buildierM(tokens);
                 fileManager.changeDirectory(folderName);
                 break;
         }
     }
 
-    public String[] buildierM(String[] credentialValues){
-        String[] add = new String[credentialValues.length-1];
-        for (int j = 0; j < credentialValues.length-1; j++) {
-            add[j]=credentialValues[j+1];
+    public String buildierM(String[] credentialValues){
+        String stopNameFileOneToNameFileTwo = "->";
+        int corrector = 1;
+        int index = 0;
+        int lengthStr = 0;
+        for (int j = 0; j < credentialValues.length-(1+corrector); j++) {
+            if(credentialValues[j+(1+corrector)].equals(stopNameFileOneToNameFileTwo)){
+                index = j;
+                break;
+            }
         }
-        return add;
+        if(index ==0){
+            lengthStr = credentialValues.length-(1+corrector);
+        } else {
+            lengthStr = (credentialValues.length - (credentialValues.length - index));
+        }
+        String[] add = new String[lengthStr];
+        for (int i = 0; i < add.length; i++) {
+            add[i]=credentialValues[i+(1+corrector)];
+        }
+        return stringConstruction(add);
+    }
+
+    protected String stringConstruction(String[] strings){
+        String str = null;
+        for (int i = 0; i < strings.length; i++) {
+            if (i==0){
+                str=strings[i];
+            }else {
+                str = str +" "+strings[i];
+            }
+        }
+        return str;
+    }
+
+    public String buildierTwoNameFile(String[] credentialValues){
+        String stopNameFileOneToNameFileTwo = "->";
+        int corrector = 1;
+        int index = 0;
+        boolean serach = false;
+        for (int i = 0; i < credentialValues.length; i++) {
+            if(credentialValues[i].equals(stopNameFileOneToNameFileTwo)){
+                System.out.println(credentialValues[i]);
+                index = i;
+                serach = true;
+                break;
+            }
+        }
+        if(serach == false){
+            return "";
+        }
+        String add[] = new String[credentialValues.length-index-corrector];
+
+        for (int i = 0; i < add.length; i++) {
+            add[i] = credentialValues[i+index+corrector];
+        }
+
+        return stringConstruction(add);
     }
 }
