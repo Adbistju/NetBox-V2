@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 
 public class ProtoHandler extends ChannelInboundHandlerAdapter {
     public enum State {
-        IDLE, NAME_LENGTH, NAME, FILE_LENGTH, FILE
+        IDLE, NAME_LENGTH, NAME, FILE_LENGTH, FILE, FILE_LIST_SIZE, FILE_LIST_ELEMENT
     }
 
     private State currentState = State.IDLE;
@@ -52,7 +52,6 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
                     });
                     System.out.println("-------------------------------------------------");
                 } else if (readed == (byte) 23) {
-                    System.out.println("TUTUTUTUTUTU");
                     while (buf.isReadable()){
                         System.out.print((char) buf.readByte());
                     }
@@ -61,6 +60,11 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
                         stringBuilder.append((char) buf.readByte());
                     }
                     String commandClient = String.valueOf(stringBuilder);
+                } else if (readed == (byte) 33) {
+                    currentState = State.FILE_LIST_SIZE;
+                    /*while (buf.isReadable()){
+                        System.out.print((char) buf.readByte());
+                    }*/
                 } else {
                     System.out.println("ERROR: Invalid first byte - " + readed);
                 }
@@ -81,6 +85,26 @@ public class ProtoHandler extends ChannelInboundHandlerAdapter {
                     System.out.println("STATE: Filename received - _" + new String(fileName, "UTF-8"));
                     out = new BufferedOutputStream(new FileOutputStream("_" + new String(fileName)));
                     currentState = State.FILE_LENGTH;
+                }
+            }
+
+            if (currentState == State.FILE_LIST_SIZE) {
+                if (buf.readableBytes() >= 4) {
+                    nextLength = buf.readInt();
+                    currentState = State.FILE_LIST_ELEMENT;
+                }
+            }
+
+            if(currentState == State.FILE_LIST_ELEMENT){
+                if (buf.readableBytes() >= nextLength) {
+                    //System.out.println(nextLength);
+                    byte [] message = new byte[nextLength];
+                    for (int i = 0; i < message.length; i++) {
+                        message[i] = buf.readByte();
+                    }
+                    String str = new String(message, "UTF-8");
+                    currentState = State.IDLE;
+                    System.out.println(str);
                 }
             }
 

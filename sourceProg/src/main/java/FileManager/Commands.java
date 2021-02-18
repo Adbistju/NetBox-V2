@@ -14,4 +14,7 @@ public interface Commands {
     String SERVER = "srv";
     String SERVER_DOWNLOAD = "srvdwn";
     String SERVER_REQUEST_FILE = "srvrqs";
+
+    String DELETE_FILE = "dl";
+    String HELP = "help";
 }
