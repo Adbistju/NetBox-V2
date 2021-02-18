@@ -76,6 +76,7 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
                         message[i] = buf.readByte();
                     }
                     String str = new String(message, "UTF-8");
+                    svrc.setCtx(ctx);
                     svrc.command(str);
                     currentState = State.IDLE;
                 }

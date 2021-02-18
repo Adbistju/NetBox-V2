@@ -7,20 +7,5 @@ public class MainClient {
         new Thread(() -> Network.getInstance().start(networkStarter)).start();
         ClientControl clientControl = new ClientControl();
         clientControl.start();
-
-
-        /*try {
-            ProtoFileSender.sendFile(Paths.get("SourceTest/demo.txt"), Network.getInstance().getCurrentChannel(), future -> {
-                if (!future.isSuccess()) {
-                    future.cause().printStackTrace();
-                }
-                if (future.isSuccess()) {
-                    System.out.println("Файл успешно передан");
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        /*ProtoFileSender.sendReQuestFile("SourceTest/demo.txt", Network.getInstance().getCurrentChannel());*/
     }
 }

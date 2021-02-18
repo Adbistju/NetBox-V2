@@ -1,11 +1,18 @@
 import FileManager.Commands;
 import FileManager.FileManager;
+import io.netty.channel.ChannelHandlerContext;
+
+import java.util.List;
 
 public class ServerControl {
 
     int corrector = 1;
 
     FileManager fileManager = new FileManager(".\\SourceTest");
+    private ChannelHandlerContext ctx;
+    public void setCtx(ChannelHandlerContext ctx) {
+        this.ctx = ctx;
+    }
 
     public String getCurrentDir() {
         return fileManager.getCurrentFolder();
@@ -19,11 +26,20 @@ public class ServerControl {
 
         switch (command) {
             case Commands.LIST_OF_FILES:
-                fileManager.listOfFiles(false);
+                List<String> listFalse = fileManager.listOfFilesList(false);
+                for (int i = 0; i < listFalse.size(); i++) {
+                    System.out.print(listFalse.get(i) + " ");
+                    ProtoFileSender.sendListFile(listFalse.get(i), ctx.channel());
+                }
                 break;
-            case Commands.LIST_OF_WITH_SIZE:
-                fileManager.listOfFiles(true);
+            case Commands.LIST_OF_WITH_SIZE:{
+                List<String> listTrue = fileManager.listOfFilesList(true);
+                for (int i = 0; i < listTrue.size(); i++) {
+                    System.out.print(listTrue.get(i) + " ");
+                    ProtoFileSender.sendListFile(listTrue.get(i), ctx.channel());
+                }
                 break;
+            }
             case Commands.COPY_FILE:
                 String sourceFileName = buildierM(tokens);
                 String destFileName = buildierTwoNameFile(tokens);
@@ -40,13 +56,21 @@ public class ServerControl {
             }
             case Commands.FILE_CONTENT:{
                 String folderName = buildierM(tokens);
-                fileManager.fileContent(folderName);
+                List<String> listContent = fileManager.fileContentList(folderName);
+                for (int i = 0; i < listContent.size(); i++) {
+                    ProtoFileSender.sendListFile(listContent.get(i), ctx.channel());
+                }
                 break;
             }
             case Commands.CHANGE_DIRECTORY:
                 String folderName = buildierM(tokens);
                 fileManager.changeDirectory(folderName);
                 break;
+            case Commands.DELETE_FILE:{
+                String sourceFileNameDelete = buildierM(tokens);
+                fileManager.deleteFile(sourceFileNameDelete);
+                break;
+            }
         }
     }
 

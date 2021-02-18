@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileManager {
 
@@ -45,6 +47,30 @@ public class FileManager {
         }
     }
 
+    public List listOfFilesList(boolean withSize){
+        File currentFolderAsFile = new File(currentFolder);
+        List<String> listFile = new ArrayList<>();
+        File files[] = currentFolderAsFile.listFiles();
+
+        for (File file : files){
+            if(file.isDirectory()){
+                if(withSize){
+                    listFile.add(file.getName() + "\\ " + FileUtils.sizeOfDirectory(file));
+                } else {
+                    listFile.add(file.getName() + "\\ ");
+                }
+                System.out.println();
+            } else {
+                if(withSize){
+                    listFile.add(file.getName() + " " + file.length());
+                } else {
+                    listFile.add(file.getName() + " ");
+                }
+            }
+        }
+        return listFile;
+    }
+
     public void copyFile(String sourceFileName, String destFileName) {
         File source = new File(currentFolder + "\\" + sourceFileName);
         File dest = new File(currentFolder + "\\" + destFileName);
@@ -64,6 +90,11 @@ public class FileManager {
         } catch (IOException e) {
             System.err.println("Произошла ошибка!");
         }
+    }
+
+    public void deleteFile(String sourceFileName) {
+        File source = new File(currentFolder + "\\" + sourceFileName);
+        FileUtils.deleteQuietly(source);
     }
 
     public void createFile(String fileName) {
@@ -87,6 +118,23 @@ public class FileManager {
         } catch (IOException e){
             System.err.println("Произошла ошибка!");
         }
+    }
+
+    public List fileContentList(String fileName) {
+        File file = new File(currentFolder + "\\" + fileName);
+        List<String> list = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = reader.readLine();
+            while (line != null) {
+                list.add(line);
+                System.out.println(line);
+                line = reader.readLine();
+            }
+        } catch (IOException e){
+            System.err.println("Произошла ошибка!");
+        }
+        return list;
     }
 
     public void changeDirectory(String folderName) {

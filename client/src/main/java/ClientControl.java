@@ -66,6 +66,18 @@ public class ClientControl {
                         e.printStackTrace();
                     }
                     break;
+                case Commands.HELP:
+                    System.out.println("ls     - список файлов");
+                    System.out.println("ls     - список файлов с их размером");
+                    System.out.println("cp     - копировать файл, написав после имени файла -> можно указать свое имя файла");
+                    System.out.println("ls     - создать файл");
+                    System.out.println("cat    - показать содержимое файла");
+                    System.out.println("msg    - отправить текствое сообщение");
+                    System.out.println("dl     - удалить имя файла");
+                    System.out.println("srv    - писать перед командами, которые нужно выполнить на сервере");
+                    System.out.println("srvdwn - запросить файл с сервера");
+                    System.out.println("srvrgs - отправить файл на сервер");
+                    break;
             }
             input = scanner.nextLine();
         }

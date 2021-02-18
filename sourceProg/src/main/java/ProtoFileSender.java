@@ -96,4 +96,18 @@ public class ProtoFileSender {
         buf.writeBytes(msg);
         channel.writeAndFlush(buf);
     }
+
+    public static void sendListFile(String str, Channel channel) {
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+        buf.writeByte((byte) 33);
+        channel.writeAndFlush(buf);
+        byte[] msg = str.getBytes(StandardCharsets.UTF_8);
+        buf = ByteBufAllocator.DEFAULT.directBuffer(4);
+        buf.writeInt(msg.length);
+        channel.writeAndFlush(buf);
+
+        buf = ByteBufAllocator.DEFAULT.directBuffer();
+        buf.writeBytes(msg);
+        channel.writeAndFlush(buf);
+    }
 }
