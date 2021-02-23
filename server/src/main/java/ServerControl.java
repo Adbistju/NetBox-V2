@@ -133,4 +133,8 @@ public class ServerControl {
 
         return stringConstruction(add);
     }
+
+    public void setFileAddresUser(String addres){
+        fileManager.setRoot(addres);
+    }
 }

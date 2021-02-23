@@ -19,6 +19,11 @@ public class FileManager {
         this.root = currentFolder;
     }
 
+    public void setRoot(String root) {
+        this.currentFolder = root;
+        this.root = root;
+    }
+
     public String getCurrentFolder() {
         return currentFolder;
     }

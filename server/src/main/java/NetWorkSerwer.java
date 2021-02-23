@@ -11,13 +11,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 public class NetWorkSerwer {
     private static final String protoHandler = ".\\SourceTest";
 
-    private static NetWorkSerwer ourInstance = new NetWorkSerwer();
-
-    public static NetWorkSerwer getInstance() {
-        return ourInstance;
-    }
-
-    protected NetWorkSerwer() {
+    public int port;
+    protected NetWorkSerwer(int port) {
+        this.port = port;
     }
 
     private Channel currentChannel;
@@ -36,12 +32,12 @@ public class NetWorkSerwer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().addLast(
-                                    new ProtoHandlerServer()
+                                   new ProtoHandlerServer()
                             );
                             currentChannel = socketChannel;
                         }
                     });
-            ChannelFuture future = b.bind(8189).sync();
+            ChannelFuture future = b.bind(port).sync();
             future.channel().closeFuture().sync();
         } finally {
             mainGroup.shutdownGracefully();
