@@ -19,6 +19,11 @@ public class FileManager {
         this.root = currentFolder;
     }
 
+    public void setRoot(String root) {
+        this.currentFolder = root;
+        this.root = root;
+    }
+
     public String getCurrentFolder() {
         return currentFolder;
     }
@@ -146,5 +151,8 @@ public class FileManager {
         } else {
             this.currentFolder = this.currentFolder + "\\" + folderName;
         }
+    }
+    public void createDir(String fileName) {
+        new File(fileName).mkdir();
     }
 }

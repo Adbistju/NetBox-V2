@@ -1,11 +1,16 @@
+import DataBase.DataBaseList;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
     public enum State {
@@ -22,12 +27,85 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
 
     ServerControl svrc = new ServerControl();
 
+    private static List<Channel> clients = new ArrayList<>();
+
     public ProtoHandlerServer() {
+    }
+
+    private boolean userIsAuth(ChannelHandlerContext ctx) {
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).equals(ctx.channel())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void toAuth(ChannelHandlerContext ctx, Object msg) {
+        String str = null;
+        ByteBuf buf = ((ByteBuf) msg);
+        while (buf.readableBytes() > 0){
+            byte readed = buf.readByte();
+            if (readed == (byte) 26) {
+                currentState = State.MESSAGE_LENGTH;
+            }
+            if (currentState == State.MESSAGE_LENGTH) {
+                if (buf.readableBytes() >= 4) {
+                    nextLength = buf.readInt();
+                    currentState = State.MESSAGE;
+                }
+            }
+            if(currentState == State.MESSAGE){
+                if (buf.readableBytes() >= nextLength) {
+                    System.out.println(nextLength);
+                    byte [] message = new byte[nextLength];
+                    for (int i = 0; i < message.length; i++) {
+                        message[i] = buf.readByte();
+                    }
+                    //str = null;
+                    try {
+                        str = new String(message, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    currentState = State.IDLE;
+                    String[] credentialValues = str.split("\\s");
+                    if(credentialValues[1].equals("reg+")){
+                        DataBaseList.addUSer(credentialValues[2], credentialValues[3], credentialValues[4]);
+                        System.out.println(credentialValues[2]);
+                        System.out.println(credentialValues[3]);
+                        System.out.println(credentialValues[4]);
+                        System.out.println("add-added");
+                        svrc.fileManager.createDir(DataBaseList.getName(credentialValues[4]));
+                        System.out.println(credentialValues[4]);
+                        svrc.setFileAddresUser(".\\ServerRoot\\"+ DataBaseList.getName(credentialValues[2]));
+                        clients.add(ctx.channel());
+                        break;
+                    }
+                    if (DataBaseList.searchName(credentialValues[1], credentialValues[2])){
+                        System.out.println("add-added");
+                        svrc.setFileAddresUser(".\\ServerRoot\\"+ DataBaseList.getName(credentialValues[1]));
+                        clients.add(ctx.channel());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private String userName(ChannelHandlerContext ctx) {
+        System.out.println(ctx.channel().toString());
+        return "1";
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = ((ByteBuf) msg);
+        if(!userIsAuth(ctx)){
+            toAuth(ctx, msg);
+            buf.release();
+            return;
+        }
         while (buf.readableBytes() > 0) {
             if (currentState == State.IDLE) {
                 byte readed = buf.readByte();
@@ -36,7 +114,7 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
                     receivedFileLength = 0L;
                     System.out.println("STATE: Start file receiving");
                 } else if (readed == (byte) 24) {
-                    System.out.println("REGUEST");
+                    System.out.println("REQUEST");
                     while (buf.isReadable()){
                         stringBuilder.append((char) buf.readByte());
                     }
@@ -70,7 +148,6 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
 
             if(currentState == State.SERVER_COMMAND){
                 if (buf.readableBytes() >= nextLength) {
-                    System.out.println(nextLength);
                     byte [] message = new byte[nextLength];
                     for (int i = 0; i < message.length; i++) {
                         message[i] = buf.readByte();
