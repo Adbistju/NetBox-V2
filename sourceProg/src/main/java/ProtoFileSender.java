@@ -73,6 +73,20 @@ public class ProtoFileSender {
         channel.writeAndFlush(buf);
     }
 
+    public static void sendAuth(String str, Channel channel) {
+        ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
+        buf.writeByte((byte) 26);
+        channel.writeAndFlush(buf);
+        byte[] msg = str.getBytes(StandardCharsets.UTF_8);
+        buf = ByteBufAllocator.DEFAULT.directBuffer(4);
+        buf.writeInt(msg.length);
+        channel.writeAndFlush(buf);
+
+        buf = ByteBufAllocator.DEFAULT.directBuffer();
+        buf.writeBytes(msg);
+        channel.writeAndFlush(buf);
+    }
+
     public static void sendCommand(String str, Channel channel) {
         ByteBuf buf = ByteBufAllocator.DEFAULT.directBuffer(1);
         buf.writeByte((byte) 22);

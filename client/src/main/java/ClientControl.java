@@ -51,6 +51,9 @@ public class ClientControl {
                 case Commands.MESSAGE:
                     ProtoFileSender.sendMessage(input,Network.getInstance().getCurrentChannel());
                     break;
+                case Commands.AUTH:
+                    ProtoFileSender.sendAuth(input,Network.getInstance().getCurrentChannel());
+                    break;
 
                 case Commands.SERVER:
                     ProtoFileSender.sendCommand(input,Network.getInstance().getCurrentChannel());
@@ -68,7 +71,7 @@ public class ClientControl {
                     break;
                 case Commands.HELP:
                     System.out.println("ls     - список файлов");
-                    System.out.println("ls     - список файлов с их размером");
+                    System.out.println("ll     - список файлов с их размером");
                     System.out.println("cp     - копировать файл, написав после имени файла -> можно указать свое имя файла");
                     System.out.println("ls     - создать файл");
                     System.out.println("cat    - показать содержимое файла");

@@ -1,3 +1,4 @@
+import DataBase.DataBaseList;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,7 +46,7 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
         ByteBuf buf = ((ByteBuf) msg);
         while (buf.readableBytes() > 0){
             byte readed = buf.readByte();
-            if (readed == (byte) 23) {
+            if (readed == (byte) 26) {
                 currentState = State.MESSAGE_LENGTH;
             }
             if (currentState == State.MESSAGE_LENGTH) {
@@ -67,12 +68,23 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    System.out.println(str);
                     currentState = State.IDLE;
-                    if (str.equals("msg 1")){
+                    String[] credentialValues = str.split("\\s");
+                    if(credentialValues[1].equals("reg+")){
+                        DataBaseList.addUSer(credentialValues[2], credentialValues[3], credentialValues[4]);
+                        System.out.println(credentialValues[2]);
+                        System.out.println(credentialValues[3]);
+                        System.out.println(credentialValues[4]);
                         System.out.println("add-added");
-                        svrc.setFileAddresUser(".\\ServerRoot\\"+ userName(ctx));
-                        //.\SourceTest
+                        svrc.fileManager.createDir(DataBaseList.getName(credentialValues[4]));
+                        System.out.println(credentialValues[4]);
+                        svrc.setFileAddresUser(".\\ServerRoot\\"+ DataBaseList.getName(credentialValues[2]));
+                        clients.add(ctx.channel());
+                        break;
+                    }
+                    if (DataBaseList.searchName(credentialValues[1], credentialValues[2])){
+                        System.out.println("add-added");
+                        svrc.setFileAddresUser(".\\ServerRoot\\"+ DataBaseList.getName(credentialValues[1]));
                         clients.add(ctx.channel());
                         break;
                     }
@@ -91,6 +103,8 @@ public class ProtoHandlerServer extends ChannelInboundHandlerAdapter {
         ByteBuf buf = ((ByteBuf) msg);
         if(!userIsAuth(ctx)){
             toAuth(ctx, msg);
+            buf.release();
+            return;
         }
         while (buf.readableBytes() > 0) {
             if (currentState == State.IDLE) {

@@ -8,7 +8,7 @@ public class ServerControl {
 
     int corrector = 1;
 
-    FileManager fileManager = new FileManager(".\\SourceTest");
+    FileManager fileManager = new FileManager(".\\ServerRoot");
     private ChannelHandlerContext ctx;
     public void setCtx(ChannelHandlerContext ctx) {
         this.ctx = ctx;

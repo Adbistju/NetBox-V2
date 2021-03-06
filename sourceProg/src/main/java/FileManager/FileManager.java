@@ -152,4 +152,7 @@ public class FileManager {
             this.currentFolder = this.currentFolder + "\\" + folderName;
         }
     }
+    public void createDir(String fileName) {
+        new File(fileName).mkdir();
+    }
 }

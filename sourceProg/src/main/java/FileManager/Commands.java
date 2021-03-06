@@ -10,6 +10,7 @@ public interface Commands {
     String EXIT = "exit";
 
     String MESSAGE = "msg";
+    String AUTH = "auth";
 
     String SERVER = "srv";
     String SERVER_DOWNLOAD = "srvdwn";
